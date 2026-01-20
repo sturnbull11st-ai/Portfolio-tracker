@@ -1,0 +1,106 @@
+.card {
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+}
+
+.iconWrapper {
+    background: rgba(56, 189, 248, 0.1);
+    padding: 1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.content h3 {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.valueWrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.editBtn {
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 4px;
+    border-radius: 4px;
+    opacity: 0.5;
+    transition: var(--transition);
+}
+
+.editBtn:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.editForm {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.input {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    width: 150px;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.actions {
+    display: flex;
+    gap: 4px;
+}
+
+.saveBtn,
+.cancelBtn {
+    padding: 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.saveBtn {
+    background: var(--success-color);
+    color: #000;
+}
+
+.saveBtn:hover {
+    opacity: 0.9;
+}
+
+.cancelBtn {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.cancelBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}

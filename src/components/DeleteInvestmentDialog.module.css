@@ -1,0 +1,119 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.dialog {
+    background: #1E1E1E;
+    border: 1px solid #333;
+    padding: 24px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90vw;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    color: #E0E0E0;
+}
+
+.title {
+    margin: 0 0 16px 0;
+    font-size: 1.25rem;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+.message {
+    margin-bottom: 20px;
+    color: #AAAAAA;
+    line-height: 1.5;
+}
+
+.field {
+    margin-bottom: 20px;
+}
+
+.label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #AAAAAA;
+}
+
+.input {
+    width: 100%;
+    padding: 10px;
+    background: #2A2A2A;
+    border: 1px solid #333;
+    border-radius: 6px;
+    color: white;
+    font-size: 1rem;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #00E5FF;
+}
+
+.checkboxRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    cursor: pointer;
+}
+
+.checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #00E5FF;
+    cursor: pointer;
+}
+
+.checkboxLabel {
+    color: #E0E0E0;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.cancelBtn {
+    padding: 10px 16px;
+    background: transparent;
+    border: 1px solid #444;
+    color: #AAAAAA;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.cancelBtn:hover {
+    color: white;
+    border-color: #666;
+}
+
+.confirmBtn {
+    padding: 10px 20px;
+    background: #FF4444;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.confirmBtn:hover {
+    background: #FF2222;
+}

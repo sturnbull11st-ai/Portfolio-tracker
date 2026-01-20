@@ -1,0 +1,100 @@
+{
+  "cash": 132102.5,
+  "investments": [
+    {
+      "id": "jirsz1i",
+      "type": "stock",
+      "symbol": "MKL",
+      "name": "Markel",
+      "region": "US",
+      "sector": "General",
+      "quantity": 2,
+      "bookCost": 4285.43,
+      "bookCostCurrency": "USD",
+      "buyDate": "2025-12-11",
+      "currentPrice": 2059.51,
+      "dailyChangePercent": -1.18,
+      "currency": "USD",
+      "lastUpdated": "2026-01-19T18:50:56.342Z",
+      "history": [
+        {
+          "date": "2026-01-14",
+          "price": 2089.44
+        },
+        {
+          "date": "2026-01-17",
+          "price": 2059.51
+        },
+        {
+          "date": "2026-01-19",
+          "price": 2059.51
+        }
+      ]
+    },
+    {
+      "id": "n626vwu",
+      "type": "fund",
+      "symbol": "GB00B5ZX1M70",
+      "name": "Artemis Global Income I ACC",
+      "region": "Global",
+      "sector": "Mixed",
+      "quantity": 7930.914,
+      "bookCost": 25000,
+      "bookCostCurrency": "GBP",
+      "buyDate": "2025-09-11",
+      "currentPrice": 3.75,
+      "dailyChangePercent": 0.52,
+      "currency": "USD",
+      "lastUpdated": "2026-01-19T18:50:55.578Z",
+      "history": [
+        {
+          "date": "2026-01-14",
+          "price": 3.69
+        },
+        {
+          "date": "2026-01-17",
+          "price": 3.75
+        },
+        {
+          "date": "2026-01-19",
+          "price": 3.75
+        }
+      ]
+    },
+    {
+      "id": "38oo0uw",
+      "type": "stock",
+      "symbol": "MU",
+      "name": "Micron Technology",
+      "region": "US",
+      "sector": "Technology",
+      "quantity": 50,
+      "bookCost": 15162.77,
+      "bookCostCurrency": "USD",
+      "buyDate": "0026-01-06",
+      "currentPrice": 362.75,
+      "dailyChangePercent": 7.76,
+      "currency": "USD",
+      "lastUpdated": "2026-01-19T18:50:56.405Z",
+      "history": [
+        {
+          "date": "0026-01-06",
+          "price": 303.2554
+        },
+        {
+          "date": "2026-01-17",
+          "price": 362.75
+        },
+        {
+          "date": "2026-01-19",
+          "price": 362.75
+        }
+      ],
+      "bookCostExchangeRate": 0.75
+    }
+  ],
+  "exchangeRates": {
+    "USD": 0.7447
+  },
+  "lastUpdated": "2026-01-19T18:50:56.449Z"
+}
