@@ -66,8 +66,6 @@ async function internalScrape(symbol: string, type: 'fund' | 'etf' | 'stock'): P
             $('.mod-tearsheet-overview__quote__bar li').each((i, el) => {
                 const text = $(el).text();
                 if (text.includes("Change") && (text.includes('%') || text.includes('/'))) {
-                    // Extract value part? Usually separated by some structure or just text.
-                    // Try to find the value class inside
                     const val = $(el).find('.mod-ui-data-list__value').text().trim();
                     if (val) changeText = val;
                 }
@@ -75,22 +73,23 @@ async function internalScrape(symbol: string, type: 'fund' | 'etf' | 'stock'): P
         }
 
         if (!changeText) {
-            // Fallback existing selector (but maybe skip first if it's price?)
-            // actually, better to just rely on the label search above.
-            // But let's keep a safer fallback if possible, or just default to 0.
             const firstVal = $('.mod-tearsheet-overview__quote__bar').find('.mod-ui-data-list__value').first().text().trim();
-            // If firstVal looks like a price (no % and no /), ignore it.
             if (firstVal && (firstVal.includes('%') || firstVal.includes('/'))) {
                 changeText = firstVal;
             }
         }
 
-        const price = parseFloat(priceText.replace(/,/g, ''));
+        let price = parseFloat(priceText.replace(/,/g, ''));
+
+        // Handle GBX (Pence Sterling)
+        if (currency === 'GBX') {
+            price = price / 100;
+            currency = 'GBP';
+        }
+
         let changePercent = 0;
 
         if (changeText) {
-            // US stocks often show "Absolute / Percentage" e.g. "+1.50 / +1.20%"
-            // We want the part with '%'
             if (changeText.includes('/')) {
                 const parts = changeText.split('/');
                 const pctPart = parts.find(p => p.includes('%')) || parts[1];
@@ -103,17 +102,22 @@ async function internalScrape(symbol: string, type: 'fund' | 'etf' | 'stock'): P
         }
 
         if (isNaN(price)) {
-            // US Stock fallback selector
             const quoteBarPrice = $('.mod-tearsheet-overview__quote li').first().find('.mod-ui-data-list__value').text().trim();
             const p2 = parseFloat(quoteBarPrice.replace(/,/g, ''));
             if (!isNaN(p2)) {
-                // If currency missing, guess from symbol?
                 let fallbackCurrency = currency || 'USD';
                 if (!currency) {
-                    if (symbol.includes(':LSE')) fallbackCurrency = 'GBP'; // Actually GBX usually but let's stick to simple
+                    if (symbol.includes(':LSE')) fallbackCurrency = 'GBP';
                     else if (symbol.includes(':GER') || symbol.includes(':FRA')) fallbackCurrency = 'EUR';
                 }
-                return { price: p2, currency: fallbackCurrency, changePercent };
+
+                let finalPrice = p2;
+                if (fallbackCurrency === 'GBX') {
+                    finalPrice = p2 / 100;
+                    fallbackCurrency = 'GBP';
+                }
+
+                return { price: finalPrice, currency: fallbackCurrency, changePercent };
             }
             return null;
         }
