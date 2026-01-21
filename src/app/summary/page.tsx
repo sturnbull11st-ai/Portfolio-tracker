@@ -105,9 +105,9 @@ export default async function SummaryPage() {
                     <thead>
                         <tr>
                             <th>Investment</th>
-                            <th className={styles.right}>Price</th>
-                            <th className={styles.right}>Value (GBP)</th>
                             <th className={styles.right}>Daily Change</th>
+                            <th className={styles.right}>Value (GBP)</th>
+                            <th className={styles.right}>Price</th>
                             <th className={styles.right}>Total Return</th>
                         </tr>
                     </thead>
@@ -123,16 +123,16 @@ export default async function SummaryPage() {
                                         <span className={styles.symbol}>{inv.symbol}</span>
                                     </td>
                                     <td className={styles.right}>
-                                        {formatMoney(inv.currentPrice || 0, inv.currency)}
+                                        <div className={`${styles.pill} ${isPositive ? styles.positive : styles.negative}`}>
+                                            {isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                                            {inv.dailyChangePercent?.toFixed(2)}%
+                                        </div>
                                     </td>
                                     <td className={styles.right} style={{ fontWeight: 600 }}>
                                         {formatMoney(inv.valueGBP)}
                                     </td>
                                     <td className={styles.right}>
-                                        <div className={`${styles.pill} ${isPositive ? styles.positive : styles.negative}`}>
-                                            {isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                                            {inv.dailyChangePercent?.toFixed(2)}%
-                                        </div>
+                                        {formatMoney(inv.currentPrice || 0, inv.currency)}
                                     </td>
                                     <td className={`${styles.right} ${isRetPositive ? styles.positive : styles.negative}`} style={{ fontWeight: 600 }}>
                                         {inv.totalReturnPct > 0 ? '+' : ''}{inv.totalReturnPct.toFixed(2)}%
