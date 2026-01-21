@@ -39,17 +39,24 @@ async function internalScrape(symbol: string, type: 'fund' | 'etf' | 'stock'): P
         // Currency
         let currency = '';
         const subheading = $('.mod-tearsheet-overview__quote__subheading').first().text();
-        const currencyMatch = subheading.match(/Price \(([A-Z]{3})\)/);
+        // Broader regex to catch "Price (XXX)", "Price in XXX", etc.
+        const currencyMatch = subheading.match(/Price\s+(?:\w+\s+)?\(([A-Z]{3})\)/i);
         if (currencyMatch) {
-            currency = currencyMatch[1];
+            currency = currencyMatch[1].toUpperCase();
         }
 
         if (!currency) {
             $('.mod-ui-data-list__label').each((i, el) => {
-                if ($(el).text().trim() === 'Currency') {
-                    currency = $(el).next('.mod-ui-data-list__value').text().trim();
+                const labelText = $(el).text().trim();
+                if (labelText === 'Currency' || labelText.includes('Currency')) {
+                    currency = $(el).next('.mod-ui-data-list__value').text().trim().toUpperCase();
                 }
             });
+        }
+
+        // LSE Fallback if still unknown
+        if (!currency && symbol.toLowerCase().includes(':lse')) {
+            currency = 'GBX'; // Reasonable default for LSE assets showing as pence
         }
 
         // Change %
@@ -105,10 +112,11 @@ async function internalScrape(symbol: string, type: 'fund' | 'etf' | 'stock'): P
             const quoteBarPrice = $('.mod-tearsheet-overview__quote li').first().find('.mod-ui-data-list__value').text().trim();
             const p2 = parseFloat(quoteBarPrice.replace(/,/g, ''));
             if (!isNaN(p2)) {
-                let fallbackCurrency = currency || 'USD';
-                if (!currency) {
-                    if (symbol.includes(':LSE')) fallbackCurrency = 'GBP';
+                let fallbackCurrency = currency;
+                if (!fallbackCurrency) {
+                    if (symbol.includes(':LSE')) fallbackCurrency = 'GBX';
                     else if (symbol.includes(':GER') || symbol.includes(':FRA')) fallbackCurrency = 'EUR';
+                    else fallbackCurrency = 'USD';
                 }
 
                 let finalPrice = p2;
