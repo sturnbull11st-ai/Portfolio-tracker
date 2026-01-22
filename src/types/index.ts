@@ -28,9 +28,16 @@ export interface Investment {
     lastUpdated?: string;
 }
 
-export interface PortfolioData {
+export interface Portfolio {
+    id: string;
+    name: string;
     cash: number;
     investments: Investment[];
+}
+
+export interface PortfolioData {
+    portfolios: Portfolio[];
+    currentPortfolioId: string;
     exchangeRates: Record<string, number>; // e.g. "USD": 0.78 (1 unit of key = x GBP)
     lastUpdated: string;
 }

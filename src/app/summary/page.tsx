@@ -1,4 +1,5 @@
 import { getPortfolio } from '@/lib/storage';
+import { Investment } from '@/types';
 import Link from 'next/link';
 import { ArrowLeft, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
 import { refreshPortfolio } from '../actions';
@@ -7,15 +8,16 @@ import styles from './page.module.css';
 export const dynamic = 'force-dynamic';
 
 export default async function SummaryPage() {
-    const portfolio = await getPortfolio();
+    const data = await getPortfolio();
+    const portfolio = data.portfolios.find(p => p.id === data.currentPortfolioId) || data.portfolios[0];
 
     // Calculate Data
     let totalValueGBP = 0;
     let totalPrevValueGBP = 0;
 
-    const investments = portfolio.investments.map(inv => {
+    const investments = portfolio.investments.map((inv: Investment) => {
         // 1. Current Value Rate (Live Scraped)
-        const rate = (inv.currency && inv.currency !== 'GBP') ? (portfolio.exchangeRates[inv.currency] || 1) : 1;
+        const rate = (inv.currency && inv.currency !== 'GBP') ? (data.exchangeRates[inv.currency] || 1) : 1;
 
         // 2. Book Cost Rate (Historical/Manual OR Scraped)
         let costRate = 1;
@@ -23,7 +25,7 @@ export default async function SummaryPage() {
             if (inv.bookCostExchangeRate && inv.bookCostExchangeRate > 0) {
                 costRate = inv.bookCostExchangeRate;
             } else {
-                costRate = portfolio.exchangeRates[inv.bookCostCurrency] || 1;
+                costRate = data.exchangeRates[inv.bookCostCurrency] || 1;
             }
         }
 
@@ -112,7 +114,7 @@ export default async function SummaryPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {investments.map(inv => {
+                        {investments.map((inv: any) => {
                             const isPositive = (inv.dailyChangePercent || 0) >= 0;
                             const isRetPositive = inv.totalReturnPct >= 0;
 

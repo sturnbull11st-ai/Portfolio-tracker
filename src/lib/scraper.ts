@@ -1,4 +1,6 @@
 import * as cheerio from 'cheerio';
+import { getPortfolio } from '@/lib/storage';
+import { Investment } from '@/types';
 
 interface ScrapedData {
     price: number;
@@ -39,24 +41,36 @@ async function internalScrape(symbol: string, type: 'fund' | 'etf' | 'stock'): P
         // Currency
         let currency = '';
         const subheading = $('.mod-tearsheet-overview__quote__subheading').first().text();
-        // Broader regex to catch "Price (XXX)", "Price in XXX", etc.
-        const currencyMatch = subheading.match(/Price\s+(?:\w+\s+)?\(([A-Z]{3})\)/i);
+
+        // Match "Price (XXX)" or "Price (XXX)" with any characters before/after
+        const currencyMatch = subheading.match(/\(?([A-Z]{3})\)?/);
         if (currencyMatch) {
-            currency = currencyMatch[1].toUpperCase();
+            const found = currencyMatch[1].toUpperCase();
+            if (['GBX', 'GBP', 'USD', 'EUR'].includes(found)) {
+                currency = found;
+            }
         }
 
         if (!currency) {
-            $('.mod-ui-data-list__label').each((i, el) => {
-                const labelText = $(el).text().trim();
-                if (labelText === 'Currency' || labelText.includes('Currency')) {
-                    currency = $(el).next('.mod-ui-data-list__value').text().trim().toUpperCase();
+            $('.mod-ui-data-list__row').each((i, el) => {
+                const text = $(el).text().trim();
+                // Check for labels like "Price (GBX)" or "Currency"
+                const gbxMatch = text.match(/Price\s+\(?([A-Z]{3})\)?/i);
+                if (gbxMatch) {
+                    currency = gbxMatch[1].toUpperCase();
+                }
+                if (!currency) {
+                    const label = $(el).find('.mod-ui-data-list__label').text().trim();
+                    if (label === 'Currency') {
+                        currency = $(el).find('.mod-ui-data-list__value').text().trim().toUpperCase();
+                    }
                 }
             });
         }
 
         // LSE Fallback if still unknown
         if (!currency && symbol.toLowerCase().includes(':lse')) {
-            currency = 'GBX'; // Reasonable default for LSE assets showing as pence
+            currency = 'GBX';
         }
 
         // Change %
@@ -148,7 +162,7 @@ export async function scrapeInvestmentData(symbol: string, type: 'fund' | 'etf' 
 
     // 2. If no suffix provided, try common ones
     if (!symbol.includes(':')) {
-        const suffixes = ['NYQ', 'NSQ', 'LSE']; // NYSE, NASDAQ, LONDON
+        const suffixes = ['LSE', 'NYQ', 'NSQ']; // Prioritize London for UK context
         for (const suffix of suffixes) {
             const candidate = `${symbol}:${suffix}`;
             console.log(`Retrying with ${candidate}...`);

@@ -1,4 +1,5 @@
 import { getPortfolio } from '@/lib/storage';
+import { Investment } from '@/types';
 import HistoryChart from '@/components/HistoryChart';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -7,9 +8,10 @@ import styles from './page.module.css';
 export const dynamic = 'force-dynamic';
 
 export default async function ChartsPage() {
-    const portfolio = await getPortfolio();
+    const data = await getPortfolio();
+    const portfolio = data.portfolios.find(p => p.id === data.currentPortfolioId) || data.portfolios[0];
 
-    const chartsData = portfolio.investments.map((inv) => {
+    const chartsData = portfolio.investments.map((inv: Investment) => {
         // Construct history points
         // 1. Start with stored history
         let points = [...(inv.history || [])];
@@ -58,7 +60,7 @@ export default async function ChartsPage() {
             </header>
 
             <div className={styles.grid}>
-                {chartsData.map((inv) => (
+                {chartsData.map((inv: any) => (
                     <div key={inv.id} className={styles.card}>
                         <div className={styles.cardHeader}>
                             <h3>{inv.name}</h3>

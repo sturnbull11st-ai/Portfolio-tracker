@@ -2,6 +2,7 @@ import { getPortfolio } from '@/lib/storage';
 import CashManager from '@/components/CashManager';
 import InvestmentList from '@/components/InvestmentList';
 import InvestmentForm from '@/components/InvestmentForm';
+import PortfolioSwitcher from '@/components/PortfolioSwitcher';
 import Link from 'next/link';
 import { LayoutDashboard, LineChart, TrendingUp, RefreshCw } from 'lucide-react';
 import { refreshPortfolio } from './actions';
@@ -10,7 +11,15 @@ import styles from './page.module.css';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const portfolio = await getPortfolio();
+  const data = await getPortfolio();
+  const portfolio = data.portfolios.find(p => p.id === data.currentPortfolioId) || data.portfolios[0];
+
+  const totalInvestmentsGBP = portfolio.investments.reduce((s, i) => {
+    const rate = (i.currency && i.currency !== 'GBP') ? (data.exchangeRates[i.currency] || 1) : 1;
+    return s + (i.quantity * (i.currentPrice || 0) * rate);
+  }, 0);
+
+  const totalPortfolioValue = portfolio.cash + totalInvestmentsGBP;
 
   return (
     <div className="container">
@@ -36,17 +45,15 @@ export default async function Home() {
       <main className={styles.main}>
         <div className={styles.topSection}>
           <div className={styles.summaryCard}>
-            <h3>Total Portfolio Value</h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <h3>Total Portfolio Value</h3>
+              <PortfolioSwitcher portfolios={data.portfolios} currentId={data.currentPortfolioId} />
+            </div>
             <div className={styles.totalValue}>
-              {(portfolio.cash + portfolio.investments.reduce((s, i) => {
-                // Fallback rate logic duplicate for server render
-                const rate = (i.currency && i.currency !== 'GBP') ? (portfolio.exchangeRates[i.currency] || 1) : 1;
-                return s + (i.quantity * (i.currentPrice || 0) * rate);
-              }, 0))
-                .toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })}
+              {totalPortfolioValue.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })}
             </div>
             <div className={styles.lastUpdated}>
-              Last updated: {new Date(portfolio.lastUpdated).toLocaleString()}
+              Last updated: {new Date(data.lastUpdated).toLocaleString()}
               <form action={refreshPortfolio} className={styles.refreshForm}>
                 <button type="submit" className={styles.refreshBtn} title="Refresh Prices">
                   <RefreshCw size={14} />
@@ -58,7 +65,7 @@ export default async function Home() {
           <CashManager initialCash={portfolio.cash} />
         </div>
 
-        <InvestmentList investments={portfolio.investments} exchangeRates={portfolio.exchangeRates} />
+        <InvestmentList investments={portfolio.investments} exchangeRates={data.exchangeRates} />
         <InvestmentForm />
       </main>
     </div>

@@ -2,23 +2,19 @@
 
 import { getPortfolio, savePortfolio } from '@/lib/storage';
 import { scrapeInvestmentData, scrapeExchangeRate } from '@/lib/scraper';
-import { Investment, InvestmentType } from '@/types';
+import { Investment, InvestmentType, PortfolioData, Portfolio } from '@/types';
 import { revalidatePath } from 'next/cache';
 
 function generateId() {
     return Math.random().toString(36).substring(2, 9);
 }
 
-async function updateExchangeRates(portfolio: any, currenciesToCheck: Set<string>) {
-    // base is always local portfolio currency, assume GBP for now as user asked to convert TO GBP.
-    // So we need rate from Foreign -> GBP. e.g. USDGBP.
-    // scraping scrapeExchangeRate('USD', 'GBP') => 0.78
-
+async function updateExchangeRates(data: PortfolioData, currenciesToCheck: Set<string>) {
     for (const currency of currenciesToCheck) {
         if (currency === 'GBP') continue;
         const rate = await scrapeExchangeRate(currency, 'GBP');
         if (rate) {
-            portfolio.exchangeRates[currency] = rate;
+            data.exchangeRates[currency] = rate;
         }
     }
 }
@@ -40,7 +36,9 @@ export async function addInvestment(prevState: any, formData: FormData) {
         return { message: 'Missing required fields' };
     }
 
-    const portfolio = await getPortfolio();
+    const data = await getPortfolio();
+    const portfolio = data.portfolios.find(p => p.id === data.currentPortfolioId);
+    if (!portfolio) return { message: 'Active portfolio not found' };
 
     // Scrape initial data
     const marketData = await scrapeInvestmentData(symbol, type);
@@ -50,7 +48,7 @@ export async function addInvestment(prevState: any, formData: FormData) {
     if (bookCostCurrency && bookCostCurrency !== 'GBP') currencies.add(bookCostCurrency);
     if (marketData?.currency && marketData.currency !== 'GBP') currencies.add(marketData.currency);
 
-    await updateExchangeRates(portfolio, currencies);
+    await updateExchangeRates(data, currencies);
 
     const newInvestment: Investment = {
         id: generateId(),
@@ -66,7 +64,7 @@ export async function addInvestment(prevState: any, formData: FormData) {
         buyDate,
         currentPrice: marketData?.price || 0,
         dailyChangePercent: marketData?.changePercent || 0,
-        currency: marketData?.currency || '', // Asset currency
+        currency: marketData?.currency || '',
         lastUpdated: new Date().toISOString(),
         history: [{
             date: buyDate,
@@ -75,14 +73,17 @@ export async function addInvestment(prevState: any, formData: FormData) {
     };
 
     portfolio.investments.push(newInvestment);
-    await savePortfolio(portfolio);
+    await savePortfolio(data);
 
     revalidatePath('/');
     return { message: 'Investment added successfully' };
 }
 
 export async function editInvestment(id: string, formData: FormData) {
-    const portfolio = await getPortfolio();
+    const data = await getPortfolio();
+    const portfolio = data.portfolios.find(p => p.id === data.currentPortfolioId);
+    if (!portfolio) return { message: 'Active portfolio not found' };
+
     const index = portfolio.investments.findIndex(i => i.id === id);
     if (index === -1) return { message: 'Not found' };
 
@@ -98,28 +99,28 @@ export async function editInvestment(id: string, formData: FormData) {
     inv.region = formData.get('region') as string;
     inv.sector = formData.get('sector') as string;
 
-    // Update initial history point if it exists and matches buyDate
-    // or just reset the first point?
     const initialPrice = inv.quantity > 0 ? inv.bookCost / inv.quantity : 0;
     if (!inv.history || inv.history.length === 0) {
         inv.history = [{ date: inv.buyDate, price: initialPrice }];
     } else {
-        // Assume first point is always the buy date/price anchor
         inv.history[0] = { date: inv.buyDate, price: initialPrice };
     }
 
     // Check if we need new rates
     const currencies = new Set<string>();
     if (inv.bookCostCurrency !== 'GBP') currencies.add(inv.bookCostCurrency);
-    await updateExchangeRates(portfolio, currencies);
+    await updateExchangeRates(data, currencies);
 
-    await savePortfolio(portfolio);
+    await savePortfolio(data);
     revalidatePath('/');
     return { message: 'Updated successfully' };
 }
 
 export async function removeInvestment(id: string, saleValueGBP?: number, addToCash: boolean = true) {
-    const portfolio = await getPortfolio();
+    const data = await getPortfolio();
+    const portfolio = data.portfolios.find(p => p.id === data.currentPortfolioId);
+    if (!portfolio) return;
+
     const investment = portfolio.investments.find(i => i.id === id);
 
     if (investment && addToCash) {
@@ -128,12 +129,11 @@ export async function removeInvestment(id: string, saleValueGBP?: number, addToC
         if (saleValueGBP !== undefined) {
             valueToAdd = saleValueGBP;
         } else {
-            // Fallback to auto-calc if no value provided
             if (investment.currentPrice) {
                 let rate = 1;
                 const assetCurr = investment.currency || 'GBP';
                 if (assetCurr !== 'GBP') {
-                    rate = portfolio.exchangeRates[assetCurr] || 1;
+                    rate = data.exchangeRates[assetCurr] || 1;
                 }
                 const valueNative = investment.quantity * investment.currentPrice;
                 valueToAdd = valueNative * rate;
@@ -144,53 +144,92 @@ export async function removeInvestment(id: string, saleValueGBP?: number, addToC
     }
 
     portfolio.investments = portfolio.investments.filter(i => i.id !== id);
-    await savePortfolio(portfolio);
+    await savePortfolio(data);
     revalidatePath('/');
 }
 
 export async function updateCash(amount: number) {
-    const portfolio = await getPortfolio();
-    portfolio.cash = amount;
-    await savePortfolio(portfolio);
+    const data = await getPortfolio();
+    const portfolio = data.portfolios.find(p => p.id === data.currentPortfolioId);
+    if (portfolio) {
+        portfolio.cash = amount;
+        await savePortfolio(data);
+    }
     revalidatePath('/');
 }
 
 export async function refreshPortfolio() {
-    const portfolio = await getPortfolio();
+    const data = await getPortfolio();
     const currenciesToUpdate = new Set<string>();
 
-    const updates = portfolio.investments.map(async (inv) => {
-        // Scrape asset
-        const data = await scrapeInvestmentData(inv.symbol, inv.type);
-        if (data) {
-            inv.currentPrice = data.price;
-            inv.dailyChangePercent = data.changePercent;
-            inv.currency = data.currency;
-            inv.lastUpdated = new Date().toISOString();
+    const allUpdates = data.portfolios.flatMap(portfolio =>
+        portfolio.investments.map(async (inv) => {
+            const scrapeData = await scrapeInvestmentData(inv.symbol, inv.type);
+            if (scrapeData) {
+                inv.currentPrice = scrapeData.price;
+                inv.dailyChangePercent = scrapeData.changePercent;
+                inv.currency = scrapeData.currency;
+                inv.lastUpdated = new Date().toISOString();
 
-            // Update History
-            const today = new Date().toISOString().split('T')[0];
-            if (!inv.history) inv.history = [];
+                const today = new Date().toISOString().split('T')[0];
+                if (!inv.history) inv.history = [];
 
-            const lastPoint = inv.history[inv.history.length - 1];
-            if (lastPoint && lastPoint.date === today) {
-                lastPoint.price = inv.currentPrice;
-            } else {
-                inv.history.push({ date: today, price: inv.currentPrice });
+                const lastPoint = inv.history[inv.history.length - 1];
+                if (lastPoint && lastPoint.date === today) {
+                    lastPoint.price = inv.currentPrice;
+                } else {
+                    inv.history.push({ date: today, price: inv.currentPrice });
+                }
+
+                if (inv.currency && inv.currency !== 'GBP') currenciesToUpdate.add(inv.currency);
             }
+            if (inv.bookCostCurrency !== 'GBP') currenciesToUpdate.add(inv.bookCostCurrency);
+            return inv;
+        })
+    );
 
-            if (inv.currency && inv.currency !== 'GBP') currenciesToUpdate.add(inv.currency);
-        }
-        if (inv.bookCostCurrency !== 'GBP') currenciesToUpdate.add(inv.bookCostCurrency);
-        return inv;
-    });
-
-    await Promise.all(updates);
+    await Promise.all(allUpdates);
 
     // Refresh FX
-    await updateExchangeRates(portfolio, currenciesToUpdate);
+    await updateExchangeRates(data, currenciesToUpdate);
 
-    portfolio.lastUpdated = new Date().toISOString();
-    await savePortfolio(portfolio);
+    data.lastUpdated = new Date().toISOString();
+    await savePortfolio(data);
+    revalidatePath('/');
+}
+
+export async function addPortfolio(name: string) {
+    const data = await getPortfolio();
+    const id = generateId();
+    data.portfolios.push({
+        id,
+        name,
+        cash: 0,
+        investments: []
+    });
+    data.currentPortfolioId = id;
+    await savePortfolio(data);
+    revalidatePath('/');
+    return { id, message: 'Portfolio created' };
+}
+
+export async function switchPortfolio(id: string) {
+    const data = await getPortfolio();
+    if (data.portfolios.some(p => p.id === id)) {
+        data.currentPortfolioId = id;
+        await savePortfolio(data);
+        revalidatePath('/');
+    }
+}
+
+export async function deletePortfolio(id: string) {
+    const data = await getPortfolio();
+    if (data.portfolios.length <= 1) return { message: 'Cannot delete the only portfolio' };
+
+    data.portfolios = data.portfolios.filter(p => p.id !== id);
+    if (data.currentPortfolioId === id) {
+        data.currentPortfolioId = data.portfolios[0].id;
+    }
+    await savePortfolio(data);
     revalidatePath('/');
 }

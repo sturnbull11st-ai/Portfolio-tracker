@@ -21,16 +21,47 @@ export async function getPortfolio(): Promise<PortfolioData> {
             await fs.access(FILE_PATH);
         } catch {
             // Create if not exists
-            await fs.writeFile(FILE_PATH, JSON.stringify(DEFAULT_DATA, null, 2));
-            return DEFAULT_DATA;
+            const initialData: PortfolioData = {
+                portfolios: [{ id: 'default', name: 'General', cash: 0, investments: [] }],
+                currentPortfolioId: 'default',
+                exchangeRates: {},
+                lastUpdated: new Date().toISOString(),
+            };
+            await fs.writeFile(FILE_PATH, JSON.stringify(initialData, null, 2));
+            return initialData;
         }
 
         const fileContent = await fs.readFile(FILE_PATH, 'utf-8');
         const data = JSON.parse(fileContent);
-        return { ...DEFAULT_DATA, ...data }; // Merge with default to ensure structure
+
+        // Migration logic: handles transition from single portfolio to multiple
+        if (data.investments || data.cash !== undefined) {
+            const migratedData: PortfolioData = {
+                portfolios: [{
+                    id: 'default',
+                    name: 'General',
+                    cash: data.cash || 0,
+                    investments: data.investments || []
+                }],
+                currentPortfolioId: 'default',
+                exchangeRates: data.exchangeRates || {},
+                lastUpdated: data.lastUpdated || new Date().toISOString(),
+            };
+            // Save migrated data immediately
+            await savePortfolio(migratedData);
+            return migratedData;
+        }
+
+        return data as PortfolioData;
     } catch (error) {
         console.error('Error reading portfolio data:', error);
-        return DEFAULT_DATA;
+        // Return a fresh state if read fails
+        return {
+            portfolios: [{ id: 'default', name: 'General', cash: 0, investments: [] }],
+            currentPortfolioId: 'default',
+            exchangeRates: {},
+            lastUpdated: new Date().toISOString(),
+        };
     }
 }
 
