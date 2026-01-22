@@ -32,116 +32,87 @@ async function internalScrape(symbol: string, type: 'fund' | 'etf' | 'stock'): P
         const html = await response.text();
         const $ = cheerio.load(html);
 
-        // Price
-        let priceText = $('.mod-tearsheet-overview__quote__value').first().text().trim();
-        if (!priceText) {
-            priceText = $('.mod-tearsheet-overview__header__last-price').first().text().trim();
-        }
+        let price: number = NaN;
+        let currency: string = '';
+        let changePercent: number = 0;
 
-        // Currency
-        let currency = '';
-        const subheading = $('.mod-tearsheet-overview__quote__subheading').first().text();
+        // --- NEW ROBUST STRATEGY ---
 
-        // Match "Price (XXX)" or "Price (XXX)" with any characters before/after
-        const currencyMatch = subheading.match(/\(?([A-Z]{3})\)?/);
-        if (currencyMatch) {
-            const found = currencyMatch[1].toUpperCase();
-            if (['GBX', 'GBP', 'USD', 'EUR'].includes(found)) {
-                currency = found;
-            }
-        }
-
-        if (!currency) {
-            $('.mod-ui-data-list__row').each((i, el) => {
-                const text = $(el).text().trim();
-                // Check for labels like "Price (GBX)" or "Currency"
-                const gbxMatch = text.match(/Price\s+\(?([A-Z]{3})\)?/i);
-                if (gbxMatch) {
-                    currency = gbxMatch[1].toUpperCase();
-                }
-                if (!currency) {
-                    const label = $(el).find('.mod-ui-data-list__label').text().trim();
-                    if (label === 'Currency') {
-                        currency = $(el).find('.mod-ui-data-list__value').text().trim().toUpperCase();
-                    }
-                }
-            });
-        }
-
-        // LSE Fallback if still unknown
-        if (!currency && symbol.toLowerCase().includes(':lse')) {
-            currency = 'GBX';
-        }
-
-        // Change %
-        let changeText = '';
-        $('.mod-ui-data-list__row').each((i, el) => {
+        // 1. Scan for Price and Currency in data lists (New FT Layout)
+        // We look for any row where the label contains "Price" or "Currency"
+        $('.mod-ui-data-list__row, .mod-tearsheet-overview__quote li').each((i, el) => {
             const label = $(el).find('.mod-ui-data-list__label').text().trim();
-            if (label.includes("Today's Change") || label === 'Change') {
-                changeText = $(el).find('.mod-ui-data-list__value').text().trim();
+            const value = $(el).find('.mod-ui-data-list__value').text().trim();
+
+            if (!label || !value) return;
+
+            // Price & Currency from label: "Price (GBX)"
+            if (label.toLowerCase().includes('price')) {
+                const p = parseFloat(value.replace(/,/g, ''));
+                if (!isNaN(p)) {
+                    // Only update if we haven't found a price yet or this one is more specific
+                    if (isNaN(price)) price = p;
+
+                    // Detect currency from label like "Price (GBX)"
+                    const curMatch = label.match(/\(([A-Z]{3})\)/);
+                    if (curMatch) currency = curMatch[1].toUpperCase();
+                }
+            }
+
+            // Explicit Currency label
+            if (label.toLowerCase() === 'currency' || label.toLowerCase().includes('base currency')) {
+                if (!currency) currency = value.toUpperCase();
+            }
+
+            // Today's Change
+            if (label.includes('Change') && (value.includes('%') || value.includes('/'))) {
+                const parts = value.split('/');
+                const pctPart = parts.find(p => p.includes('%')) || parts[parts.length - 1];
+                if (pctPart) {
+                    const match = pctPart.match(/([+-]?\d+\.?\d*)/);
+                    if (match) changePercent = parseFloat(match[1]);
+                }
             }
         });
 
-        // Fallback: Try looking for any list item with "Change" in the label
-        if (!changeText) {
-            $('.mod-tearsheet-overview__quote__bar li').each((i, el) => {
-                const text = $(el).text();
-                if (text.includes("Change") && (text.includes('%') || text.includes('/'))) {
-                    const val = $(el).find('.mod-ui-data-list__value').text().trim();
-                    if (val) changeText = val;
-                }
-            });
+        // 2. Fallbacks for Price (Old Selectors)
+        if (isNaN(price)) {
+            let priceText = $('.mod-tearsheet-overview__quote__value').first().text().trim() ||
+                $('.mod-tearsheet-overview__header__last-price').first().text().trim();
+            if (priceText) price = parseFloat(priceText.replace(/,/g, ''));
         }
 
-        if (!changeText) {
-            const firstVal = $('.mod-tearsheet-overview__quote__bar').find('.mod-ui-data-list__value').first().text().trim();
-            if (firstVal && (firstVal.includes('%') || firstVal.includes('/'))) {
-                changeText = firstVal;
+        // 3. Fallbacks for Currency (Subheading and General search)
+        if (!currency) {
+            const subheading = $('.mod-tearsheet-overview__quote__subheading').first().text();
+            const curMatch = subheading.match(/\(([A-Z]{3})\)/);
+            if (curMatch) {
+                currency = curMatch[1].toUpperCase();
+            } else {
+                // Last ditch: look for GBX/GBP/USD raw in the overview section
+                const overviewText = $('.mod-tearsheet-overview').text();
+                if (overviewText.includes('(GBX)')) currency = 'GBX';
+                else if (overviewText.includes('(GBP)')) currency = 'GBP';
+                else if (overviewText.includes('(USD)')) currency = 'USD';
             }
         }
 
-        let price = parseFloat(priceText.replace(/,/g, ''));
+        // 4. LSE Heuristics
+        if (!currency || currency === 'Unknown') {
+            if (symbol.toUpperCase().includes(':LSE')) {
+                currency = 'GBX'; // London stocks are almost always quoted in pence (GBX) on FT
+            }
+        }
 
-        // Handle GBX (Pence Sterling)
+        // 5. Final validation
+        if (isNaN(price)) return null;
+
+        // --- FINAL CONVERSION ---
+
+        // Handle GBX (Pence Sterling) scaling
         if (currency === 'GBX') {
             price = price / 100;
             currency = 'GBP';
-        }
-
-        let changePercent = 0;
-
-        if (changeText) {
-            if (changeText.includes('/')) {
-                const parts = changeText.split('/');
-                const pctPart = parts.find(p => p.includes('%')) || parts[1];
-                if (pctPart) {
-                    changePercent = parseFloat(pctPart.replace('%', '').replace('+', '').trim());
-                }
-            } else {
-                changePercent = parseFloat(changeText.replace('%', '').replace('+', ''));
-            }
-        }
-
-        if (isNaN(price)) {
-            const quoteBarPrice = $('.mod-tearsheet-overview__quote li').first().find('.mod-ui-data-list__value').text().trim();
-            const p2 = parseFloat(quoteBarPrice.replace(/,/g, ''));
-            if (!isNaN(p2)) {
-                let fallbackCurrency = currency;
-                if (!fallbackCurrency) {
-                    if (symbol.includes(':LSE')) fallbackCurrency = 'GBX';
-                    else if (symbol.includes(':GER') || symbol.includes(':FRA')) fallbackCurrency = 'EUR';
-                    else fallbackCurrency = 'USD';
-                }
-
-                let finalPrice = p2;
-                if (fallbackCurrency === 'GBX') {
-                    finalPrice = p2 / 100;
-                    fallbackCurrency = 'GBP';
-                }
-
-                return { price: finalPrice, currency: fallbackCurrency, changePercent };
-            }
-            return null;
         }
 
         return {
@@ -151,6 +122,7 @@ async function internalScrape(symbol: string, type: 'fund' | 'etf' | 'stock'): P
         };
 
     } catch (error) {
+        console.error(`Scrape error for ${symbol}:`, error);
         return null;
     }
 }
