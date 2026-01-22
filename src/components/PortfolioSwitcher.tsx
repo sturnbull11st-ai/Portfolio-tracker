@@ -63,7 +63,7 @@ export default function PortfolioSwitcher({ portfolios, currentId }: Props) {
                             >
                                 <span>{p.name}</span>
                                 {portfolios.length > 1 && (
-                                    <button className={styles.deleteBtn} onClick={(e) => handleDelete(e, p.id)}>
+                                    <button className={styles.deleteBtn} onClick={(e) => handleDelete(e, p.id)} title="Delete Portfolio">
                                         <Trash2 size={14} />
                                     </button>
                                 )}
@@ -71,25 +71,27 @@ export default function PortfolioSwitcher({ portfolios, currentId }: Props) {
                         ))}
                     </div>
 
-                    {!showAdd ? (
-                        <button className={styles.addTrigger} onClick={() => setShowAdd(true)}>
-                            <Plus size={14} /> Add Portfolio
-                        </button>
-                    ) : (
-                        <form onSubmit={handleAdd} className={styles.addForm}>
-                            <input
-                                autoFocus
-                                value={newName}
-                                onChange={e => setNewName(e.target.value)}
-                                placeholder="Name (e.g. ISA)"
-                                className={styles.input}
-                            />
-                            <div className={styles.addActions}>
-                                <button type="button" onClick={() => setShowAdd(false)}>Cancel</button>
-                                <button type="submit" disabled={isPending}>Create</button>
-                            </div>
-                        </form>
-                    )}
+                    <div className={styles.actions}>
+                        {!showAdd ? (
+                            <button className={styles.addTrigger} onClick={() => setShowAdd(true)}>
+                                <Plus size={14} /> Add Portfolio
+                            </button>
+                        ) : (
+                            <form onSubmit={handleAdd} className={styles.addForm}>
+                                <input
+                                    autoFocus
+                                    value={newName}
+                                    onChange={e => setNewName(e.target.value)}
+                                    placeholder="Name (e.g. ISA)"
+                                    className={styles.input}
+                                />
+                                <div className={styles.addActions}>
+                                    <button type="button" onClick={() => setShowAdd(false)}>Cancel</button>
+                                    <button type="submit" disabled={isPending}>Create</button>
+                                </div>
+                            </form>
+                        )}
+                    </div>
                 </div>
             )}
         </div>

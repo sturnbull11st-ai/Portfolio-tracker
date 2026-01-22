@@ -26,7 +26,7 @@ export default async function Home() {
       <header className={styles.header}>
         <div className={styles.logo}>
           <LayoutDashboard color="var(--accent-color)" size={32} />
-          <h1>Antigravity Portfolio</h1>
+          <h1>Thest Portfolio</h1>
         </div>
 
         <nav className={styles.nav}>
