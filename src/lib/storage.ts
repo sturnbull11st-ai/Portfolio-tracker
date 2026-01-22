@@ -6,8 +6,8 @@ const DATA_DIR = path.join(process.cwd(), 'data');
 const FILE_PATH = path.join(DATA_DIR, 'portfolio.json');
 
 const DEFAULT_DATA: PortfolioData = {
-    cash: 0,
-    investments: [],
+    portfolios: [{ id: 'default', name: 'General', cash: 0, investments: [] }],
+    currentPortfolioId: 'default',
     exchangeRates: {},
     lastUpdated: new Date().toISOString(),
 };
@@ -21,14 +21,8 @@ export async function getPortfolio(): Promise<PortfolioData> {
             await fs.access(FILE_PATH);
         } catch {
             // Create if not exists
-            const initialData: PortfolioData = {
-                portfolios: [{ id: 'default', name: 'General', cash: 0, investments: [] }],
-                currentPortfolioId: 'default',
-                exchangeRates: {},
-                lastUpdated: new Date().toISOString(),
-            };
-            await fs.writeFile(FILE_PATH, JSON.stringify(initialData, null, 2));
-            return initialData;
+            await fs.writeFile(FILE_PATH, JSON.stringify(DEFAULT_DATA, null, 2));
+            return DEFAULT_DATA;
         }
 
         const fileContent = await fs.readFile(FILE_PATH, 'utf-8');
@@ -56,12 +50,7 @@ export async function getPortfolio(): Promise<PortfolioData> {
     } catch (error) {
         console.error('Error reading portfolio data:', error);
         // Return a fresh state if read fails
-        return {
-            portfolios: [{ id: 'default', name: 'General', cash: 0, investments: [] }],
-            currentPortfolioId: 'default',
-            exchangeRates: {},
-            lastUpdated: new Date().toISOString(),
-        };
+        return DEFAULT_DATA;
     }
 }
 
