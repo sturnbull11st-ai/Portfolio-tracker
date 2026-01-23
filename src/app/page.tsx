@@ -15,8 +15,10 @@ export default async function Home() {
   const portfolio = data.portfolios.find(p => p.id === data.currentPortfolioId) || data.portfolios[0];
 
   const totalInvestmentsGBP = portfolio.investments.reduce((s, i) => {
-    const rate = (i.currency && i.currency !== 'GBP') ? (data.exchangeRates[i.currency] || 1) : 1;
-    return s + (i.quantity * (i.currentPrice || 0) * rate);
+    const marketRate = (i.currency && i.currency !== 'GBP') ? (data.exchangeRates[i.currency] || 1) : 1;
+    const fxFee = portfolio.fxFeePercent || 0;
+    const effectiveRate = i.currency === 'GBP' ? 1 : marketRate * (1 - (fxFee / 100));
+    return s + (i.quantity * (i.currentPrice || 0) * effectiveRate);
   }, 0);
 
   const totalPortfolioValue = portfolio.cash + totalInvestmentsGBP;

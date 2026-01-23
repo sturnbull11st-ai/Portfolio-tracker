@@ -133,7 +133,9 @@ export async function removeInvestment(id: string, saleValueGBP?: number, addToC
                 let rate = 1;
                 const assetCurr = investment.currency || 'GBP';
                 if (assetCurr !== 'GBP') {
-                    rate = data.exchangeRates[assetCurr] || 1;
+                    const marketRate = data.exchangeRates[assetCurr] || 1;
+                    const fxFee = portfolio.fxFeePercent || 0;
+                    rate = marketRate * (1 - (fxFee / 100));
                 }
                 const valueNative = investment.quantity * investment.currentPrice;
                 valueToAdd = valueNative * rate;

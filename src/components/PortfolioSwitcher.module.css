@@ -136,3 +136,38 @@
     color: var(--accent-color);
     font-weight: 600;
 }
+
+.itemInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.settingsBtn {
+    background: transparent;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settingsBtn:hover {
+    color: var(--accent-color);
+    background: rgba(41, 98, 255, 0.1);
+}
+
+.formGroup {
+    margin-bottom: 12px;
+}
+
+.formGroup label {
+    display: block;
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 4px;
+}

@@ -6,7 +6,7 @@ const DATA_DIR = path.join(process.cwd(), 'data');
 const FILE_PATH = path.join(DATA_DIR, 'portfolio.json');
 
 const DEFAULT_DATA: PortfolioData = {
-    portfolios: [{ id: 'default', name: 'General', cash: 0, investments: [] }],
+    portfolios: [{ id: 'default', name: 'General', cash: 0, investments: [], fxFeePercent: 0 }],
     currentPortfolioId: 'default',
     exchangeRates: {},
     lastUpdated: new Date().toISOString(),

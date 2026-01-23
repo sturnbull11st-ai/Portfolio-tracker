@@ -33,6 +33,7 @@ export interface Portfolio {
     name: string;
     cash: number;
     investments: Investment[];
+    fxFeePercent?: number; // Fee applied to FX conversions (e.g. 1.5)
 }
 
 export interface PortfolioData {

@@ -17,7 +17,9 @@ export default async function SummaryPage() {
 
     const investments = portfolio.investments.map((inv: Investment) => {
         // 1. Current Value Rate (Live Scraped)
-        const rate = (inv.currency && inv.currency !== 'GBP') ? (data.exchangeRates[inv.currency] || 1) : 1;
+        const marketRate = (inv.currency && inv.currency !== 'GBP') ? (data.exchangeRates[inv.currency] || 1) : 1;
+        const fxFee = portfolio.fxFeePercent || 0;
+        const rate = inv.currency === 'GBP' ? 1 : marketRate * (1 - (fxFee / 100));
 
         // 2. Book Cost Rate (Historical/Manual OR Scraped)
         let costRate = 1;
@@ -25,7 +27,8 @@ export default async function SummaryPage() {
             if (inv.bookCostExchangeRate && inv.bookCostExchangeRate > 0) {
                 costRate = inv.bookCostExchangeRate;
             } else {
-                costRate = data.exchangeRates[inv.bookCostCurrency] || 1;
+                const bookMarketRate = data.exchangeRates[inv.bookCostCurrency] || 1;
+                costRate = bookMarketRate * (1 - (fxFee / 100));
             }
         }
 
