@@ -207,7 +207,8 @@ export async function addPortfolio(name: string) {
         id,
         name,
         cash: 0,
-        investments: []
+        investments: [],
+        fxFeePercent: 0
     });
     data.currentPortfolioId = id;
     await savePortfolio(data);
@@ -234,4 +235,15 @@ export async function deletePortfolio(id: string) {
     }
     await savePortfolio(data);
     revalidatePath('/');
+}
+
+export async function updatePortfolioSettings(id: string, name: string, fxFeePercent: number) {
+    const data = await getPortfolio();
+    const portfolio = data.portfolios.find(p => p.id === id);
+    if (portfolio) {
+        portfolio.name = name;
+        portfolio.fxFeePercent = fxFeePercent;
+        await savePortfolio(data);
+        revalidatePath('/');
+    }
 }
