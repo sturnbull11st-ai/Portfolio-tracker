@@ -1,100 +1,503 @@
 {
-  "cash": 132102.5,
-  "investments": [
+  "portfolios": [
     {
-      "id": "jirsz1i",
-      "type": "stock",
-      "symbol": "MKL",
-      "name": "Markel",
-      "region": "US",
-      "sector": "General",
-      "quantity": 2,
-      "bookCost": 4285.43,
-      "bookCostCurrency": "USD",
-      "buyDate": "2025-12-11",
-      "currentPrice": 2059.51,
-      "dailyChangePercent": -1.18,
-      "currency": "USD",
-      "lastUpdated": "2026-01-19T18:50:56.342Z",
-      "history": [
+      "id": "default",
+      "name": "General",
+      "cash": 30000,
+      "investments": [
         {
-          "date": "2026-01-14",
-          "price": 2089.44
+          "id": "n626vwu",
+          "type": "fund",
+          "symbol": "GB00B5ZX1M70",
+          "name": "Artemis Global Income I ACC",
+          "region": "Global",
+          "sector": "Mixed",
+          "quantity": 10646.39,
+          "bookCost": 35000,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2025-09-11",
+          "currentPrice": 3.78,
+          "dailyChangePercent": -0.55,
+          "currency": "GBP",
+          "lastUpdated": "2026-01-24T07:22:42.224Z",
+          "history": [
+            {
+              "date": "2025-09-11",
+              "price": 3.287499330759065
+            },
+            {
+              "date": "2026-01-17",
+              "price": 3.75
+            },
+            {
+              "date": "2026-01-19",
+              "price": 3.75
+            },
+            {
+              "date": "2026-01-24",
+              "price": 3.78
+            }
+          ]
         },
         {
-          "date": "2026-01-17",
-          "price": 2059.51
+          "id": "38oo0uw",
+          "type": "stock",
+          "symbol": "MU",
+          "name": "Micron Technology",
+          "region": "US",
+          "sector": "Technology",
+          "quantity": 70,
+          "bookCost": 23268.26,
+          "bookCostCurrency": "USD",
+          "buyDate": "0026-01-06",
+          "currentPrice": 399.65,
+          "dailyChangePercent": 0.52,
+          "currency": "USD",
+          "lastUpdated": "2026-01-24T07:22:42.489Z",
+          "history": [
+            {
+              "date": "0026-01-06",
+              "price": 332.4037142857143
+            },
+            {
+              "date": "2026-01-17",
+              "price": 362.75
+            },
+            {
+              "date": "2026-01-19",
+              "price": 362.75
+            },
+            {
+              "date": "2026-01-24",
+              "price": 399.65
+            }
+          ],
+          "bookCostExchangeRate": 0.75
         },
         {
-          "date": "2026-01-19",
-          "price": 2059.51
-        }
-      ]
-    },
-    {
-      "id": "n626vwu",
-      "type": "fund",
-      "symbol": "GB00B5ZX1M70",
-      "name": "Artemis Global Income I ACC",
-      "region": "Global",
-      "sector": "Mixed",
-      "quantity": 7930.914,
-      "bookCost": 25000,
-      "bookCostCurrency": "GBP",
-      "buyDate": "2025-09-11",
-      "currentPrice": 3.75,
-      "dailyChangePercent": 0.52,
-      "currency": "GBP",
-      "lastUpdated": "2026-01-19T18:50:55.578Z",
-      "history": [
-        {
-          "date": "2026-01-14",
-          "price": 3.69
+          "id": "p2vqws2",
+          "type": "stock",
+          "symbol": "GOOGL",
+          "name": "Alphabet",
+          "region": "US",
+          "sector": "Technology",
+          "quantity": 4,
+          "bookCost": 648.02,
+          "bookCostCurrency": "USD",
+          "bookCostExchangeRate": 0.75,
+          "buyDate": "2025-06-01",
+          "currentPrice": 327.93,
+          "dailyChangePercent": -0.79,
+          "currency": "USD",
+          "lastUpdated": "2026-01-24T07:22:42.345Z",
+          "history": [
+            {
+              "date": "2025-06-01",
+              "price": 162.005
+            },
+            {
+              "date": "2026-01-24",
+              "price": 327.93
+            }
+          ]
         },
         {
-          "date": "2026-01-17",
-          "price": 3.75
+          "id": "b1a1qsg",
+          "type": "stock",
+          "symbol": "BARC",
+          "name": "Barclays",
+          "region": "UK",
+          "sector": "Financial",
+          "quantity": 410,
+          "bookCost": 1999.61,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2026-01-09",
+          "currentPrice": 4.803,
+          "dailyChangePercent": -1.06,
+          "currency": "GBP",
+          "lastUpdated": "2026-01-24T07:22:42.327Z",
+          "history": [
+            {
+              "date": "2026-01-09",
+              "price": 4.877097560975609
+            },
+            {
+              "date": "2026-01-24",
+              "price": 4.803
+            }
+          ]
         },
         {
-          "date": "2026-01-19",
-          "price": 3.75
-        }
-      ]
-    },
-    {
-      "id": "38oo0uw",
-      "type": "stock",
-      "symbol": "MU",
-      "name": "Micron Technology",
-      "region": "US",
-      "sector": "Technology",
-      "quantity": 50,
-      "bookCost": 15162.77,
-      "bookCostCurrency": "USD",
-      "buyDate": "0026-01-06",
-      "currentPrice": 362.75,
-      "dailyChangePercent": 7.76,
-      "currency": "USD",
-      "lastUpdated": "2026-01-19T18:50:56.405Z",
-      "history": [
-        {
-          "date": "0026-01-06",
-          "price": 303.2554
+          "id": "jdq3yjh",
+          "type": "stock",
+          "symbol": "GCM:LSE",
+          "name": "GCM",
+          "region": "UK",
+          "sector": "Mining",
+          "quantity": 25995,
+          "bookCost": 2999.91,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2024-01-15",
+          "currentPrice": 0.07200000000000001,
+          "dailyChangePercent": -4,
+          "currency": "GBP",
+          "lastUpdated": "2026-01-24T07:22:41.998Z",
+          "history": [
+            {
+              "date": "2024-01-15",
+              "price": 0.11540334679746105
+            },
+            {
+              "date": "2026-01-24",
+              "price": 0.07200000000000001
+            }
+          ]
         },
         {
-          "date": "2026-01-17",
-          "price": 362.75
+          "id": "b3kjbqo",
+          "type": "etf",
+          "symbol": "HSTC",
+          "name": "HSBC Hang Seng Tech ETF",
+          "region": "Asia",
+          "sector": "Technology",
+          "quantity": 1000,
+          "bookCost": 5956.29,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2025-11-01",
+          "currentPrice": 5.96,
+          "dailyChangePercent": -1.48,
+          "currency": "GBP",
+          "lastUpdated": "2026-01-24T07:22:42.445Z",
+          "history": [
+            {
+              "date": "2025-11-01",
+              "price": 5.95629
+            },
+            {
+              "date": "2026-01-24",
+              "price": 5.96
+            }
+          ]
         },
         {
-          "date": "2026-01-19",
-          "price": 362.75
+          "id": "u665ibt",
+          "type": "fund",
+          "symbol": "GB00B2PLJD73",
+          "name": "Artemis SmartGARP European EQ I Acc GBP",
+          "region": "Europe",
+          "sector": "Mixed",
+          "quantity": 1222.574,
+          "bookCost": 10000,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2025-12-01",
+          "currentPrice": 9.15,
+          "dailyChangePercent": 0.06,
+          "currency": "GBP",
+          "lastUpdated": "2026-01-24T07:22:42.292Z",
+          "history": [
+            {
+              "date": "2025-12-01",
+              "price": 8.179463983366242
+            },
+            {
+              "date": "2026-01-24",
+              "price": 9.15
+            }
+          ]
+        },
+        {
+          "id": "f1zn351",
+          "type": "fund",
+          "symbol": "GB00B7MZ0J00",
+          "name": "FTF Templeton Global Emerging Markets W Acc",
+          "region": "Emerging Mkts",
+          "sector": "Mixed",
+          "quantity": 4464.497,
+          "bookCost": 10000,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2025-08-01",
+          "currentPrice": 2.53,
+          "dailyChangePercent": -0.12,
+          "currency": "GBP",
+          "lastUpdated": "2026-01-24T07:22:42.268Z",
+          "history": [
+            {
+              "date": "2025-08-01",
+              "price": 2.2398939902972272
+            },
+            {
+              "date": "2026-01-24",
+              "price": 2.53
+            }
+          ]
+        },
+        {
+          "id": "b2em5g4",
+          "type": "etf",
+          "symbol": "IE0003Z9E2Y3",
+          "name": "Global X Copper Miners ETF USD Acc",
+          "region": "Global",
+          "sector": "Commodities",
+          "quantity": 32,
+          "bookCost": 1450.9,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2026-01-04",
+          "currentPrice": 66.33,
+          "dailyChangePercent": 2.6,
+          "currency": "USD",
+          "lastUpdated": "2026-01-24T07:22:42.300Z",
+          "history": [
+            {
+              "date": "2026-01-04",
+              "price": 45.340625
+            },
+            {
+              "date": "2026-01-24",
+              "price": 66.33
+            }
+          ]
+        },
+        {
+          "id": "5tkw5qv",
+          "type": "fund",
+          "symbol": "GB00B8N46731",
+          "name": "Invesco Global Emerg Mkts UK Z Acc",
+          "region": "Emerging Mkts",
+          "sector": "Mixed",
+          "quantity": 7817.65,
+          "bookCost": 50000,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2025-06-01",
+          "currentPrice": 7.5301,
+          "dailyChangePercent": 0.21,
+          "currency": "GBP",
+          "lastUpdated": "2026-01-24T07:22:42.242Z",
+          "history": [
+            {
+              "date": "2025-06-01",
+              "price": 6.395783899253613
+            },
+            {
+              "date": "2026-01-24",
+              "price": 7.5301
+            }
+          ]
+        },
+        {
+          "id": "5qzuflo",
+          "type": "fund",
+          "symbol": "IE00B4ND3602",
+          "name": "iShares Physical Gold ETC GBP",
+          "region": "Global",
+          "sector": "Commodities",
+          "quantity": 75,
+          "bookCost": 4897.88,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2026-01-04",
+          "currentPrice": 96.72,
+          "dailyChangePercent": 2.15,
+          "currency": "USD",
+          "lastUpdated": "2026-01-24T07:22:42.198Z",
+          "history": [
+            {
+              "date": "2026-01-04",
+              "price": 65.30506666666666
+            },
+            {
+              "date": "2026-01-24",
+              "price": 96.72
+            }
+          ]
+        },
+        {
+          "id": "9uv7dhs",
+          "type": "fund",
+          "symbol": "IE00B4ND3602",
+          "name": "iShares Physical Gold ETC GBP",
+          "region": "Global",
+          "sector": "Commodities",
+          "quantity": 95,
+          "bookCost": 5947.84,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2026-01-04",
+          "currentPrice": 96.72,
+          "dailyChangePercent": 2.15,
+          "currency": "USD",
+          "lastUpdated": "2026-01-24T07:22:42.545Z",
+          "history": [
+            {
+              "date": "2026-01-04",
+              "price": 62.60884210526316
+            },
+            {
+              "date": "2026-01-24",
+              "price": 96.72
+            }
+          ]
+        },
+        {
+          "id": "q4d6xfc",
+          "type": "etf",
+          "symbol": "IE00B4KBBD01",
+          "name": "iShares S&P 500 Utilts Sect ETF USD Acc GBP",
+          "region": "US",
+          "sector": "MIxed",
+          "quantity": 70,
+          "bookCost": 502.39,
+          "bookCostCurrency": "GBP",
+          "buyDate": "262025-03-01",
+          "currentPrice": 10.45,
+          "dailyChangePercent": -1.09,
+          "currency": "USD",
+          "lastUpdated": "2026-01-24T07:22:42.463Z",
+          "history": [
+            {
+              "date": "262025-03-01",
+              "price": 7.177
+            },
+            {
+              "date": "2026-01-24",
+              "price": 10.45
+            }
+          ]
+        },
+        {
+          "id": "bz7ruqy",
+          "type": "fund",
+          "symbol": "GB00B4351D99",
+          "name": "Jupiter Merlin Balanced Port I Acc",
+          "region": "Global",
+          "sector": "Mixed",
+          "quantity": 15103.26,
+          "bookCost": 50000,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2026-01-04",
+          "currentPrice": 3.4577999999999998,
+          "dailyChangePercent": -0.21,
+          "currency": "GBP",
+          "lastUpdated": "2026-01-24T07:22:42.188Z",
+          "history": [
+            {
+              "date": "2026-01-04",
+              "price": 3.3105435515246375
+            },
+            {
+              "date": "2026-01-24",
+              "price": 3.4577999999999998
+            }
+          ]
+        },
+        {
+          "id": "wayv5g5",
+          "type": "fund",
+          "symbol": "LGEN:LSE",
+          "name": "Legal and General",
+          "region": "UK",
+          "sector": "Financial",
+          "quantity": 751,
+          "bookCost": 1998.13,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2026-01-04",
+          "currentPrice": 2.582,
+          "dailyChangePercent": 0.04,
+          "currency": "GBP",
+          "lastUpdated": "2026-01-24T07:22:42.472Z",
+          "history": [
+            {
+              "date": "2026-01-04",
+              "price": 2.660625832223702
+            },
+            {
+              "date": "2026-01-24",
+              "price": 2.582
+            }
+          ]
+        },
+        {
+          "id": "4oydha2",
+          "type": "fund",
+          "symbol": "GB00BNLYQX62",
+          "name": "Man Sterling Corp Bd Profl Acc C",
+          "region": "Global",
+          "sector": "Corporate bonds",
+          "quantity": 23573.37,
+          "bookCost": 30000,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2024-01-01",
+          "currentPrice": 1.42,
+          "dailyChangePercent": 0,
+          "currency": "GBP",
+          "lastUpdated": "2026-01-24T07:22:42.210Z",
+          "history": [
+            {
+              "date": "2024-01-01",
+              "price": 1.272622454914168
+            },
+            {
+              "date": "2026-01-24",
+              "price": 1.42
+            }
+          ]
+        },
+        {
+          "id": "dyxg9yy",
+          "type": "fund",
+          "symbol": "GB00B1XFJS91",
+          "name": "Ninety One UK Special Situations I Acc",
+          "region": "UK",
+          "sector": "Mixed",
+          "quantity": 2474.306,
+          "bookCost": 6619.51,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2025-01-01",
+          "currentPrice": 4.3529,
+          "dailyChangePercent": 0.16,
+          "currency": "GBP",
+          "lastUpdated": "2026-01-24T07:22:42.413Z",
+          "history": [
+            {
+              "date": "2025-01-01",
+              "price": 2.67529965978339
+            },
+            {
+              "date": "2026-01-24",
+              "price": 4.3529
+            }
+          ]
+        },
+        {
+          "id": "8en12lj",
+          "type": "stock",
+          "symbol": "TSLA",
+          "name": "Tesla",
+          "region": "US",
+          "sector": "Technology",
+          "quantity": 2,
+          "bookCost": 907.52,
+          "bookCostCurrency": "GBP",
+          "buyDate": "2026-01-04",
+          "currentPrice": 449.06,
+          "dailyChangePercent": -0.07,
+          "currency": "USD",
+          "lastUpdated": "2026-01-24T07:22:42.312Z",
+          "history": [
+            {
+              "date": "2026-01-04",
+              "price": 453.76
+            },
+            {
+              "date": "2026-01-24",
+              "price": 449.06
+            }
+          ]
         }
       ],
-      "bookCostExchangeRate": 0.75
+      "fxFeePercent": 0
     }
   ],
+  "currentPortfolioId": "default",
   "exchangeRates": {
-    "USD": 0.7447
+    "USD": 0.7327
   },
-  "lastUpdated": "2026-01-19T18:50:56.449Z"
+  "lastUpdated": "2026-01-24T07:22:42.565Z"
 }
