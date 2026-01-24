@@ -66,3 +66,23 @@
     grid-column: 1 / -1;
     padding: 3rem;
 }
+
+.section {
+    margin-bottom: 4rem;
+}
+
+.section h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 0.5rem;
+}
+
+.mainChart {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    box-shadow: var(--card-shadow);
+}
