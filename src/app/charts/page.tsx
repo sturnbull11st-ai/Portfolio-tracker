@@ -12,8 +12,10 @@ export default async function ChartsPage() {
     const portfolios = data.portfolios;
     const exchangeRates = data.exchangeRates;
 
-    // 1. Process all investments into objects with standardized histories
     const today = new Date().toISOString().split('T')[0];
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
 
     // Group all investments across all portfolios
     const allInvestments = portfolios.flatMap(p =>
@@ -29,11 +31,11 @@ export default async function ChartsPage() {
     allInvestments.forEach(inv => {
         (inv.history || []).forEach(h => allDatesSet.add(h.date));
         allDatesSet.add(inv.buyDate);
-        allDatesSet.add(today);
     });
+    allDatesSet.add(today);
     const sortedDates = Array.from(allDatesSet).sort();
 
-    // 2. Calculate daily values for each portfolio and total overall
+    // 1. Calculate History
     // We'll calculate the GBP value of each portfolio on each relevant date
     const portfolioHistories: Record<string, { date: string, value: number }[]> = {};
     const totalHistory: { date: string, value: number }[] = [];
@@ -75,27 +77,33 @@ export default async function ChartsPage() {
         totalHistory.push({ date, value: dayTotalOverall });
     });
 
-    // 3. Convert to % Return charts
-    const transformToPct = (history: { date: string, value: number }[]) => {
-        // Find first date with value > 0 to set baseline
-        const basePoint = history.find(h => h.value > 0);
-        if (!basePoint) return [];
-
-        return history
-            .filter(h => h.date >= basePoint.date)
-            .map(h => ({
-                date: h.date,
-                value: ((h.value - basePoint.value) / basePoint.value) * 100
-            }));
+    // 2. Aggregate Charts Data (Starts from today)
+    const filterFromToday = (history: { date: string, value: number }[]) => {
+        return history.filter(h => h.date >= today);
     };
 
-    const totalPctChart = transformToPct(totalHistory);
+    const calculateWeeklyChange = (history: { date: string, value: number }[]) => {
+        const current = history[history.length - 1]?.value || 0;
+        const weekAgoPoint = [...history].reverse().find(h => h.date <= sevenDaysAgoStr) || history[0];
+        const weekAgoValue = weekAgoPoint?.value || 0;
 
-    const portfoliosWithCharts = portfolios.map(p => ({
-        ...p,
-        chartData: transformToPct(portfolioHistories[p.id])
-    })).filter(p => p.chartData.length > 0);
+        if (weekAgoValue === 0) return 0;
+        return ((current - weekAgoValue) / weekAgoValue) * 100;
+    };
 
+    const totalGBPChart = filterFromToday(totalHistory);
+    const totalWeeklyChange = calculateWeeklyChange(totalHistory);
+
+    const portfoliosWithCharts = portfolios.map(p => {
+        const history = portfolioHistories[p.id];
+        return {
+            ...p,
+            chartData: filterFromToday(history),
+            weeklyChange: calculateWeeklyChange(history)
+        };
+    }).filter(p => p.chartData.length > 0);
+
+    // 3. Individual Charts Data (Remains % Returns)
     const individualCharts = allInvestments.map(inv => {
         let points = [...(inv.history || [])];
         if (points.length === 0 && inv.quantity > 0) {
@@ -126,9 +134,14 @@ export default async function ChartsPage() {
             </header>
 
             <section className={styles.section}>
-                <h2>Overall Portfolio Return (%)</h2>
+                <div className={styles.sectionHeader}>
+                    <h2>Overall Portfolio Value (GBP)</h2>
+                    <span className={`${styles.badge} ${totalWeeklyChange >= 0 ? styles.positive : styles.negative}`}>
+                        Weekly: {totalWeeklyChange >= 0 ? '+' : ''}{totalWeeklyChange.toFixed(2)}%
+                    </span>
+                </div>
                 <div className={styles.mainChart}>
-                    <HistoryChart data={totalPctChart} unit="%" height={300} />
+                    <HistoryChart data={totalGBPChart} isCurrency={true} height={350} />
                 </div>
             </section>
 
@@ -139,15 +152,18 @@ export default async function ChartsPage() {
                         <div key={p.id} className={styles.card}>
                             <div className={styles.cardHeader}>
                                 <h3>{p.name}</h3>
+                                <span className={`${styles.miniBadge} ${p.weeklyChange >= 0 ? styles.positive : styles.negative}`}>
+                                    {p.weeklyChange >= 0 ? '+' : ''}{p.weeklyChange.toFixed(2)}%
+                                </span>
                             </div>
-                            <HistoryChart data={p.chartData} unit="%" />
+                            <HistoryChart data={p.chartData} isCurrency={true} />
                         </div>
                     ))}
                 </div>
             </section>
 
             <section className={styles.section}>
-                <h2>Individual Investments</h2>
+                <h2>Individual Investments (%)</h2>
                 <div className={styles.grid}>
                     {individualCharts.map((inv: any) => (
                         <div key={inv.id} className={styles.card}>
